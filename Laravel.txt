@@ -1,0 +1,817 @@
+ StudentInsertController.php
+ <?php
+
+namespace App\Http\Controllers;
+
+use App\Models\student;
+use Illuminate\Http\Request;
+use DB;
+
+
+class StudentInsertController extends Controller
+{
+    public function insert_form()
+    {
+        return view('insert_form');
+    }
+
+    public function insert(Request $request, Student $student)
+    {
+        $student->fill($request->all());
+        $student->save();
+
+        return !empty($student)
+            ?  'Record inserted successfuly! <a href="/">click here to go back</a>'
+            : 'error';
+    }
+}
+[8:20 am, 09/06/2022] Siva: create_student_table
+[8:20 am, 09/06/2022] Siva: <?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateStudentTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('student', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('phonenumber');
+            $table->string('email');
+            $table->string('address');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('student');
+    }
+}
+?>
+[8:21 am, 09/06/2022] Siva: student.php
+[8:21 am, 09/06/2022] Siva: <?php
+
+namespace App\Models;
+
+
+use Illuminate\Database\Eloquent\Model;
+
+
+class student extends Model
+{
+    protected $table = 'student';
+    protected $fillable = ['name','phonenumber','email', 'address'];
+}
+[8:21 am, 09/06/2022] Siva: web.php
+[8:21 am, 09/06/2022] Siva: <?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\StudentInsertController;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+Route::get('/', [StudentInsertController::class, 'insert_form']);
+Route::post('create',[StudentInsertController::class,'insert']);
+[8:23 am, 09/06/2022] Siva: insert_form.php
+[8:23 am, 09/06/2022] Siva: <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form action = "/create" method = "post">
+        <input type = "hidden" name = "_token" value = "<?php echo csrf_token(); ?>">
+        Name<input type='text' name='name' /><br>
+        Phone number<input type='text' name='phonenumber' /><br>
+        email<input type='text' name='email' /><br>
+        Address<input type='text' name='address' /><br>
+        <input type = 'submit' value = "Add student" />
+
+    </form>
+</body>
+</html>
+
+
+</body>
+</html>
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class User extends Model
+{
+    use HasFactory;
+}
+User.php
+[8:23 am, 09/06/2022] Siva: database insert data
+[8:23 am, 09/06/2022] Siva: php artisan serve
+[8:25 am, 09/06/2022] Siva: php artisan make:Controllers StudentInsertController
+[8:26 am, 09/06/2022] Siva: php artisan make:migration create_student_table
+[8:27 am, 09/06/2022] Siva: php artisan make:model student
+[8:27 am, 09/06/2022] Siva: php artisan migrate
+[4:35 am, 13/06/2022] Siva: <!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>View Student Records</title>
+</head>
+<body>
+    <table border =1>
+        <tr>
+            <td>ID</td>
+            <td>Name</td>
+            <td>Phonenumber</td>
+            <td>Email</td>
+            <td>Address</td>
+</tr>
+@foreach ($student as $student)
+<tr>
+    <td>{{ $student->id }}</td>
+    <td>{{ $student->name }}</td>
+    <td>{{ $student->phonenumber }}</td>
+    <td>{{ $student->email }}</td>
+    <td>{{ $student->address }}</td>
+</tr>
+@endforeach
+</table>
+
+</body>
+</html>
+[4:36 am, 13/06/2022] Siva: student_list.blade.php
+[4:36 am, 13/06/2022] Siva: <?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\StudentInsertController;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+Route::get('/', [StudentInsertController::class, 'insert_form']);
+Route::post('create',[StudentInsertController::class,'insert']);
+Route::get('view-records', [StudentInsertController::class, 'student_list']);
+[4:36 am, 13/06/2022] Siva: web.php
+[4:37 am, 13/06/2022] Siva: <?php
+
+namespace App\Http\Controllers;
+
+use App\Models\student;
+use Illuminate\Http\Request;
+use DB;
+
+
+class StudentInsertController extends Controller
+{
+    public function student_list(){
+        $student = DB::select("select * from student");
+        return view('student_list',['student'=>$student]);
+    }
+    public function insert_form()
+    {
+        return view('insert_form');
+    }
+
+    public function insert(Request $request, Student $student)
+    {
+        $student->fill($request->all());
+        $student->save();
+
+        return !empty($student)
+            ?  'Record inserted successfuly! <a href="/">click here to go back</a>'
+            : 'error';
+    }
+}
+[4:37 am, 13/06/2022] Siva: StudentInsertController
+[4:37 am, 13/06/2022] Siva: select insert data
+[9:20 am, 13/06/2022] Siva: <?php
+
+namespace App\Http\Controllers;
+
+use App\Models\student;
+use Illuminate\Http\Request;
+use DB;
+
+
+class StudentInsertController extends Controller
+{
+    public function student_list(){
+        $student = DB::select("select * from student");
+        return view('student_list',['student'=>$student]);
+    }
+    public function insert_form()
+    {
+        return view('insert_form');
+    }
+
+    public function insert(Request $request, Student $student)
+    {
+        $student->fill($request->all());
+        $student->save();
+
+        return !empty($student)
+            ?  'Record inserted successfuly! <a href="/">click here to go back</a>'
+            : 'error';
+    }
+
+    public function edit($id){
+        $student = DB::select('select * from student where i…
+[9:21 am, 13/06/2022] Siva: StudentInsertController
+[9:21 am, 13/06/2022] Siva: <?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\StudentInsertController;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+Route::get('/', [StudentInsertController::class, 'insert_form']);
+Route::post('create',[StudentInsertController::class,'insert']);
+Route::get('view-records', [StudentInsertController::class, 'student_list']);
+Route::get('edit/{id}',[StudentInsertController::class,'edit']);
+Route::put('edit/{id}',[StudentInsertController::class,'update']);
+[9:21 am, 13/06/2022] Siva: web.php
+[9:22 am, 13/06/2022] Siva: student_edit.blade.php
+[9:22 am, 13/06/2022] Siva: <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>Student Management</title>
+</head>
+<body>
+
+    <form action = "/edit/{{$student[0]->id}}" method = "post">
+        @csrf
+        @method('put')
+        <table>
+            <tr>
+                <td>Name</td>
+                <td>
+                    <input type = 'text' name = 'name' value = '{{$student[0]->name}}'/>
+                </td>
+            </tr>
+
+            <tr>
+                <td>PhoneNumber</td>
+                <td>
+                    <input type = 'text' name = 'phonenumber' value = '{{$student[0]->phonenumber}}'/>
+                </td>
+   …
+[9:23 am, 13/06/2022] Siva: <!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>View Student Records</title>
+</head>
+<body>
+    <table border =1>
+        <tr>
+            <td>ID</td>
+            <td>Name</td>
+            <td>Edit</td>
+            <td>Phonenumber</td>
+            <td>Edit</td>
+            <td>Email</td>
+            <td>Edit</td>
+            <td>Address</td>
+            <td>Edit</td>
+</tr>
+@foreach ($student as $student)
+<tr>
+    <td>{{ $student->id }}</td>
+    <td>{{ $student->name }}</td>
+    <td><a href="edit/{{$student->id}}">Edit</a></td>
+    <td>{{ $student->phonenumber }}</td>
+
+    <td><a href="edit/{{$student->id}}">Edit</a></td>
+    <td>{{ $student->email }}</td>
+
+    <td><a href="edit/{{$student->id}}">Edit</a></td>
+    <td>{{ $student->address }}</td>
+
+    <td>…
+[9:23 am, 13/06/2022] Siva: student_list.blade.php
+[9:24 am, 13/06/2022] Siva: Edit insert data
+[9:24 am, 13/06/2022] Siva: up
+[6:25 pm, 13/06/2022] Siva: <?php
+
+namespace App\Http\Controllers;
+
+use App\Models\student;
+use Illuminate\Http\Request;
+use DB;
+
+
+class StudentInsertController extends Controller
+{
+    public function student_list(){
+        $student = DB::select("select * from student");
+        return view('student_list',['student'=>$student]);
+    }
+    public function insert_form()
+    {
+        return view('insert_form');
+    }
+
+    public function insert(Request $request, Student $student)
+    {
+        $student->fill($request->all());
+        $student->save();
+
+        return !empty($student)
+            ?  'Record inserted successfuly! <a href="/">click here to go back</a>'
+            : 'error';
+    }
+
+    public function edit($id){
+        $student = DB::select('select * from student where i…
+[6:25 pm, 13/06/2022] Siva: StudentInsertController
+[6:25 pm, 13/06/2022] Siva: <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>Student Management</title>
+</head>
+<body>
+
+    <form action = "/edit/{{$student[0]->id}}" method = "post">
+        @csrf
+        @method('put')
+        <table>
+            <tr>
+                <td>Name</td>
+                <td>
+                    <input type = 'text' name = 'name' value = '{{$student[0]->name}}'/>
+                </td>
+            </tr>
+
+            <tr>
+                <td>PhoneNumber</td>
+                <td>
+                    <input type = 'text' name = 'phonenumber' value = '{{$student[0]->phonenumber}}'/>
+                </td>
+   …
+[6:25 pm, 13/06/2022] Siva: student_edit.blade.php
+[6:26 pm, 13/06/2022] Siva: <!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>View Student Records</title>
+</head>
+<body>
+    <table border =1>
+        <tr>
+            <td>ID</td>
+            <td>Name</td>
+            <td>Edit</td>
+            <td>Phonenumber</td>
+            <td>Edit</td>
+            <td>Email</td>
+            <td>Edit</td>
+            <td>Address</td>
+            <td>Edit</td>
+            <td>Delete</td>
+</tr>
+@foreach ($student as $student)
+<tr>
+    <td>{{ $student->id }}</td>
+    <td>{{ $student->name }}</td>
+    <td><a href="edit/{{$student->id}}">Edit</a></td>
+    <td>{{ $student->phonenumber }}</td>
+
+    <td><a href="edit/{{$student->id}}">Edit</a></td>
+    <td>{{ $student->email }}</td>
+
+    <td><a href="edit/{{$student->id}}">Edit</a></td>
+    <td>{{ $studen…
+[6:26 pm, 13/06/2022] Siva: student_list.blade.php
+[6:26 pm, 13/06/2022] Siva: <?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\StudentInsertController;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+Route::get('/', [StudentInsertController::class, 'insert_form']);
+Route::post('create',[StudentInsertController::class,'insert']);
+Route::get('view-records', [StudentInsertController::class, 'student_list']);
+Route::get('edit/{id}',[StudentInsertController::class,'edit']);
+Route::put('edi…
+[6:26 pm, 13/06/2022] Siva: web.php
+[6:27 pm, 13/06/2022] Siva: Delete record table  up
+[7:56 pm, 15/06/2022] Siva: New
+[7:56 pm, 15/06/2022] Siva: <?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\User;
+
+class UserController extends Controller
+{
+    public function create(){
+        return view('create_user');
+    }
+
+    public function store(Request $request){
+        $name = $request->input('name');
+        $age = $request->input('age');
+        $phone = $request->input('phone');
+
+        $user = new User;
+        $user->name = $name;
+        $user->age = $age;
+        $user->phone =$phone;
+
+        $user->save();
+
+        return "User has been succesffully created! User ID is ".$user->id;
+    }
+}
+[7:56 pm, 15/06/2022] Siva: UserController.php
+[7:57 pm, 15/06/2022] Siva: <?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateUsersTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('phone')->unique();
+            $table->integer('age');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('users');
+    }
+}
+[7:57 pm, 15/06/2022] Siva: create_users_table
+[7:58 pm, 15/06/2022] Siva: <h3>Create User Form</h3><br>
+<form action="store" method="POST">
+    <label for="">Name</label><input type="text" name="name"><br>
+    <label for="">Age</label><input type="text" name="age"><br>
+    <label for="">phone</label><input type="text" name="phone"><br>
+    <input type="submit" value="Create User">
+    @csrf
+</form>
+[7:58 pm, 15/06/2022] Siva: create_user
+[7:58 pm, 15/06/2022] Siva: <?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+Route::get('/', [UserController::class,'create']);
+Route::post('/store', [UserController::class,'store']);
+[7:58 pm, 15/06/2022] Siva: web.php
+[7:59 pm, 15/06/2022] Siva: create data eloquent
+[6:04 pm, 23/06/2022] Siva: <?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\User;
+
+class UserController extends Controller
+{
+    public function create(){
+        return view('create_user');
+    }
+
+    public function store(Request $request){
+        $name = $request->input('name');
+        $age = $request->input('age');
+        $phone = $request->input('phone');
+
+        $user = new User;
+        $user->name = $name;
+        $user->age = $age;
+        $user->phone =$phone;
+
+        $user->save();
+
+        return "User has been succesffully created! User ID is ".$user->id;
+    }
+
+    public function list(){
+        $users = User::all();
+        return view('list_user',['users'=>$users]);
+    }
+}
+[6:05 pm, 23/06/2022] Siva: UserController.php
+[6:05 pm, 23/06/2022] Siva: <h3>User List</h3><br>
+<style>
+    table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+    </style>
+<table>
+    <thead>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Phone</th>
+    </thead>
+    <tbody>
+        @foreach($users as $user)
+        <tr>
+            <td>{{$user->id}}</td>
+            <td>{{$user->name}}</td>
+            <td>{{$user->age}}</td>
+            <td>{{$user->phone}}</td>
+        </tr>
+        @endforeach
+    </tbody>
+</table>
+[6:05 pm, 23/06/2022] Siva: list_user.blade.php
+[6:05 pm, 23/06/2022] Siva: <?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+Route::get('/', [UserController::class,'create']);
+Route::post('/store', [UserController::class,'store']);
+Route::get('list', [UserController::class,'list']);
+[6:05 pm, 23/06/2022] Siva: weeb.php
+[6:06 pm, 23/06/2022] Siva: <?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateUsersTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('phone')->unique();
+            $table->integer('age');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('users');
+    }
+}
+[6:06 pm, 23/06/2022] Siva: create_users_table.php
+[6:07 pm, 23/06/2022] Siva: Read data table
+[7:21 pm, 23/06/2022] Siva: <?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateUsersTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('phone')->unique();
+            $table->integer('age');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('users');
+    }
+}
+[7:21 pm, 23/06/2022] Siva: create_users_table
+[7:21 pm, 23/06/2022] Siva: <h3>User List</h3><br>
+<style>
+    table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+    </style>
+<table>
+    <thead>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Phone</th>
+    </thead>
+    <tbody>
+        @foreach($users as $user)
+        <tr>
+            <td>{{$user->id}}</td>
+            <td>{{$user->name}}</td>
+            <td>{{$user->age}}</td>
+            <td>{{$user->phone}}</td>
+            <td><a href="edit/{{$user->id}}">Edit</a></td>
+            <td><a href="delete/{{$user->id}}">Delete</a></td>
+        </tr>
+        @endforeach
+    </tbody>
+</table>
+[7:22 pm, 23/06/2022] Siva: list_user.blade.php
+[7:22 pm, 23/06/2022] Siva: <?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\User;
+
+class UserController extends Controller
+{
+    public function create(){
+        return view('create_user');
+    }
+
+    public function store(Request $request){
+        $name = $request->input('name');
+        $age = $request->input('age');
+        $phone = $request->input('phone');
+
+        $user = new User;
+        $user->name = $name;
+        $user->age = $age;
+        $user->phone =$phone;
+
+        $user->save();
+
+        return "User has been succesffully created! User ID is ".$user->id;
+    }
+
+    public function list(){
+        $users = User::all();
+        return view('list_user',['users'=>$users]);
+    }
+
+    public function update(Request $request,$id){
+      …
+[7:22 pm, 23/06/2022] Siva: User_Controller.php
+[7:25 pm, 23/06/2022] Siva: <?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+Route::get('/', [UserController::class,'create']);
+Route::post('/store', [UserController::class,'store']);
+Route::get('list', [UserController::class,'list']);
+Route::get('edit/{id}',[UserController::class,'edit']);
+Route::post('update/{id}',[UserController::class,'update']);
+Route::get('delete/{id}', [UserController::class, 'delete']);
+[7:25 pm, 23/06/2022] Siva: web.php
+[7:25 pm, 23/06/2022] Siva: Delete record Eloquent Model
+[0:16 am, 27/06/2022] Siva: @foreach ($siva as $siva )
+{{$siva}}
+
+@endforeach
+[0:16 am, 27/06/2022] Siva: home.blade.php
+[0:16 am, 27/06/2022] Siva: <?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class Siva extends Controller
+{
+    public function home(){
+        $siva=['siva','david'];
+        return view('home',
+      ['siva' => $siva]);
+    }
+}
+[0:16 am, 27/06/2022] Siva: Siva
+[0:17 am, 27/06/2022] Siva: Route::get('/s',[Siva::class, 'home']);
+[0:17 am, 27/06/2022] Siva: web.php
+[0:17 am, 27/06/2022] Siva: Array Create foreach loop in Controller
+[0:18 am, 27/06/2022] Siva: Route::get('/si',function(){
+    $siva=['siva','sankar','sathish','suresh'];
+    return view('home',compact('siva'));
+});
+[0:18 am, 27/06/2022] Siva: web.php
+[0:19 am, 27/06/2022] Siva: @foreach ($siva as $siva )
+{{$siva}}
+
+@endforeach
+[0:19 am, 27/06/2022] Siva: home.blade.php
+[0:19 am, 27/06/2022] Siva: Array Create foreach loop in web.php Route
